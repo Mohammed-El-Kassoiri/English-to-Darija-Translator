@@ -77,28 +77,31 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 # Load the model
 model_name = "NeoAivara/English_to_Darija_translator"
+
+# Load tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
-# Set language codes
-tokenizer.src_lang = "eng_Latn"
-tokenizer.tgt_lang = "ary_Arab"
+# Define language codes (source and target)
+src_lang = "eng_Latn"  # English
+tgt_lang = "ary_Arab"  # Moroccan Arabic (Darija)
 
-# Translate
-def translate_english_to_darija(text):
-    inputs = tokenizer(text, return_tensors="pt")
-    translated_tokens = model.generate(
-        **inputs, 
-        forced_bos_token_id=tokenizer.convert_tokens_to_ids("__ary_Arab__"),
-        max_length=128
-    )
-    return tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+# Example text
+text = "yesterday I went to the market with my sister to buy some vegetables and fruits. The prices were a bit high, but we found some good deals. After that, we stopped at a small café near the station to drink mint tea. It was sunny, and people were sitting outside, talking and laughing. I love those calm moments when everything feels simple and peaceful."
 
-# Example
-english_text = "How are you?"
-darija_translation = translate_english_to_darija(english_text)
-print(f"English: {english_text}")
-print(f"Darija: {darija_translation}")
+# Tokenize input
+tokenizer.src_lang = src_lang # Set source language for tokenizer
+inputs = tokenizer(text, return_tensors="pt")
+
+# Set the language tokens for source and target
+inputs["forced_bos_token_id"] = tokenizer.convert_tokens_to_ids(tgt_lang) # Corrected line
+
+# Generate translation
+translated_tokens = model.generate(**inputs, max_length=200)
+translated_text = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)[0]
+
+print(f"English: {text}")
+print(f"Darija: {translated_text}")
 ```
 
 ## 📁 Project Structure
